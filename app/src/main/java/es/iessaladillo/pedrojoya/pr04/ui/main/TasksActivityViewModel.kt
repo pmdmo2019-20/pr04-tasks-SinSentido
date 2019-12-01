@@ -13,6 +13,8 @@ import es.iessaladillo.pedrojoya.pr04.data.entity.Task
 class TasksActivityViewModel(private val repository: Repository,
                              private val application: Application) : ViewModel() {
 
+    var taskList: LiveData<List<Task>> = repository.queryAllTasks()
+
     // Estado de la interfaz
 
     private val _tasks: MutableLiveData<List<Task>> = MutableLiveData()
@@ -55,17 +57,17 @@ class TasksActivityViewModel(private val repository: Repository,
 
     // Hace que se muestre en el RecyclerView todas las tareas.
     fun filterAll() {
-        // TODO
+        taskList = repository.queryAllTasks()
     }
 
     // Hace que se muestre en el RecyclerView sólo las tareas completadas.
     fun filterCompleted() {
-        // TODO
+        taskList = repository.queryCompletedTasks()
     }
 
     // Hace que se muestre en el RecyclerView sólo las tareas pendientes.
     fun filterPending() {
-        // TODO
+        taskList = repository.queryPendingTasks()
     }
 
     // Agrega una nueva tarea con dicho concepto. Si la se estaba mostrando
@@ -73,24 +75,32 @@ class TasksActivityViewModel(private val repository: Repository,
     // mostrar en el RecyclerView la lista con todas las tareas, no sólo
     // las completadas.
     fun addTask(concept: String) {
-        // TODO
+        if(isValidConcept(concept)){
+            repository.addTask((concept))
+        }
     }
 
     // Agrega la tarea
     fun insertTask(task: Task) {
-        // TODO
+        repository.insertTask((task))
     }
 
     // Borra la tarea
     fun deleteTask(task: Task) {
-        // TODO
+        repository.deleteTask(task.id)
     }
 
     // Borra todas las tareas mostradas actualmente en el RecyclerView.
     // Si no se estaba mostrando ninguna tarea, se muestra un mensaje
     // informativo en un SnackBar de que no hay tareas que borrar.
     fun deleteTasks() {
-        // TODO
+        val idList: MutableList<Long> = mutableListOf()
+
+        for(task in taskList.value!!){
+            idList.add(task.id)
+        }
+
+        repository.deleteTasks(idList)
     }
 
     // Marca como completadas todas las tareas mostradas actualmente en el RecyclerView,
@@ -98,7 +108,9 @@ class TasksActivityViewModel(private val repository: Repository,
     // Si no se estaba mostrando ninguna tarea, se muestra un mensaje
     // informativo en un SnackBar de que no hay tareas que marcar como completadas.
     fun markTasksAsCompleted() {
-        // TODO
+        val idList: MutableList<Long> = getIdTasks()
+
+        repository.markTasksAsCompleted(idList)
     }
 
     // Marca como pendientes todas las tareas mostradas actualmente en el RecyclerView,
@@ -106,7 +118,8 @@ class TasksActivityViewModel(private val repository: Repository,
     // Si no se estaba mostrando ninguna tarea, se muestra un mensaje
     // informativo en un SnackBar de que no hay tareas que marcar como pendientes.
     fun markTasksAsPending() {
-        // TODO
+        val idList: MutableList<Long> = getIdTasks()
+        repository.markTasksAsPending(idList)
     }
 
     // Hace que se envíe un Intent con la lista de tareas mostradas actualmente
@@ -121,17 +134,31 @@ class TasksActivityViewModel(private val repository: Repository,
     // valor de isCompleted. Si es true la tarea es marcada como completada y
     // en caso contrario es marcada como pendiente.
     fun updateTaskCompletedState(task: Task, isCompleted: Boolean) {
-        // TODO
+        if(isCompleted){
+            repository.markTaskAsPending(task.id)
+        }
+        else{
+            repository.markTaskAsCompleted(task.id)
+        }
     }
 
     // Retorna si el concepto recibido es válido (no es una cadena vacía o en blanco)
-    fun isValidConcept(concept: String): Boolean {
-        // TODO
-    }
+    fun isValidConcept(concept: String): Boolean = !concept.isNullOrBlank()
+
 
     // Pide las tareas al repositorio, atendiendo al filtro recibido
     private fun queryTasks(filter: TasksActivityFilter) {
         // TODO
+    }
+
+    private fun getIdTasks(): MutableList<Long>{
+        val idList: MutableList<Long> = mutableListOf()
+
+        for(task in taskList.value!!){
+            idList.add(task.id)
+        }
+
+        return idList
     }
 
 }

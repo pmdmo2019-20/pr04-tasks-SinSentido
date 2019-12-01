@@ -1,16 +1,17 @@
 package es.iessaladillo.pedrojoya.pr04.data
 
+import androidx.lifecycle.LiveData
 import es.iessaladillo.pedrojoya.pr04.data.entity.Task
 
 // Interfaz que contiene los métodos con los que se interactúa con la fuente de datos
 interface Repository {
 
     // Retorna una lista con todas las tareas
-    fun queryAllTasks(): List<Task>
+    fun queryAllTasks(): LiveData<List<Task>>
     // Retorna una lista con las tareas completadas
-    fun queryCompletedTasks(): List<Task>
+    fun queryCompletedTasks(): LiveData<List<Task>>
     // Retorna una lista con las tareas pendientes
-    fun queryPendingTasks(): List<Task>
+    fun queryPendingTasks(): LiveData<List<Task>>
 
     // Crea una nueva tarea a partir del concepto recibido y
     // la agrega a la fuente de datos. La tarea inicialmente no está completada y
